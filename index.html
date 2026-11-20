@@ -69,13 +69,6 @@
         <div id="errorAlert" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
           <span>⚠️</span><span>यह PNR Number रिकॉर्ड में नहीं मिला। कृपया सही PNR नंबर जांचें।</span>
         </div>
-
-        <div class="mt-5 pt-4 border-t border-slate-100 text-center">
-          <p class="text-xs text-slate-400">डेमो टेस्टिंग के लिए PNR डालें: 
-            <button type="button" onclick="quickFill('1001')" class="text-[#001b94] font-bold underline mx-1">1001</button> या 
-            <button type="button" onclick="quickFill('SKY202')" class="text-[#001b94] font-bold underline mx-1">SKY202</button>
-          </p>
-        </div>
       </div>
 
       <!-- PAYMENT RESULT CARD -->
@@ -225,32 +218,31 @@
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">© 2026 SkyIndia Pay</footer>
 
   <script>
-    const STORAGE_KEY = 'skyindia_pnr_records_v2';
+    const FIREBASE_URL = 'https://skyindia-db91c-default-rtdb.firebaseio.com';
     const ADMIN_PIN = 'Sr@22102002gerpr';
-    const defaultRecords = {
-      "1001": { pnr: "1001", customerName: "राहुल शर्मा", flightNo: "6E-2045", flightTime: "22 Nov, 10:30 AM", amount: 4599, upi: "skyindiapay@okicici", note: "Delhi (DEL) → Mumbai (BOM)", utr: "" },
-      "SKY202": { pnr: "SKY202", customerName: "अमित वर्मा", flightNo: "6E-5112", flightTime: "24 Nov, 04:15 PM", amount: 3250, upi: "skyindiapay@okaxis", note: "Gwalior (GWL) → Bengaluru (BLR)", utr: "" }
-    };
+    let cachedRecords = {};
 
-    function getRecords() {
+    async function fetchRecords() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) { localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultRecords)); return { ...defaultRecords }; }
-        return JSON.parse(saved);
-      } catch (e) { return { ...defaultRecords }; }
+        const res = await fetch(`${FIREBASE_URL}/pnr_records.json`);
+        const data = await res.json();
+        cachedRecords = data || {};
+        return cachedRecords;
+      } catch (err) {
+        alert('इंटरनेट या डेटाबेस कनेक्शन में समस्या है!');
+        return cachedRecords;
+      }
     }
 
-    function saveAllRecords(data) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-      renderAdminTable();
-    }
-
-    function quickFill(pnr) { document.getElementById('pnrInput').value = pnr; handleLookup(new Event('submit')); }
-
-    function handleLookup(e) {
+    async function handleLookup(e) {
       e.preventDefault();
       const rawPnr = document.getElementById('pnrInput').value.trim().toUpperCase();
-      const records = getRecords();
+      const btn = e.target.querySelector('button[type="submit"]');
+      if (btn) btn.textContent = 'खोज रहे हैं...';
+
+      const records = await fetchRecords();
+      if (btn) btn.textContent = 'विवरण देखें (Proceed to Pay) →';
+
       document.getElementById('utrSuccessMsg').classList.add('hidden');
       document.getElementById('utrInput').value = '';
 
@@ -287,12 +279,14 @@
       setTimeout(() => { btn.textContent = 'Copy UPI'; }, 2000);
     }
 
-    function submitUtr(e) {
+    async function submitUtr(e) {
       e.preventDefault();
       const utr = document.getElementById('utrInput').value.trim();
       const pnr = document.getElementById('displayPnrBadge').textContent.replace('PNR: #', '');
-      const records = getRecords();
-      if (records[pnr]) { records[pnr].utr = utr; saveAllRecords(records); }
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}/utr.json`, {
+        method: 'PUT',
+        body: JSON.stringify(utr)
+      });
       document.getElementById('utrSuccessMsg').classList.remove('hidden');
     }
 
@@ -305,7 +299,11 @@
       else document.getElementById('customerView').classList.remove('hidden');
     }
 
-    function openAdminAuth() { document.getElementById('pinInput').value = ''; document.getElementById('pinError').classList.add('hidden'); switchView('pin'); }
+    function openAdminAuth() {
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinError').classList.add('hidden');
+      switchView('pin');
+    }
 
     function verifyPin(e) {
       e.preventDefault();
@@ -313,11 +311,10 @@
       else document.getElementById('pinError').classList.remove('hidden');
     }
 
-    function saveRecord(e) {
+    async function saveRecord(e) {
       e.preventDefault();
       const pnr = document.getElementById('adminPnr').value.trim().toUpperCase();
-      const records = getRecords();
-      records[pnr] = {
+      const payload = {
         pnr,
         customerName: document.getElementById('adminCustomerName').value.trim(),
         flightNo: document.getElementById('adminFlightNo').value.trim().toUpperCase(),
@@ -325,15 +322,21 @@
         amount: Number(document.getElementById('adminAmount').value),
         upi: document.getElementById('adminUpi').value.trim(),
         note: document.getElementById('adminNote').value.trim(),
-        utr: records[pnr] ? records[pnr].utr : ''
+        utr: cachedRecords[pnr] ? (cachedRecords[pnr].utr || '') : ''
       };
-      saveAllRecords(records);
+
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+
       resetAdminForm();
-      alert(`PNR #${pnr} सेव हो गया!`);
+      await renderAdminTable();
+      alert(`PNR #${pnr} लाइव डेटाबेस में सेव हो गया!`);
     }
 
     function editRecord(pnr) {
-      const item = getRecords()[pnr];
+      const item = cachedRecords[pnr];
       if (!item) return;
       document.getElementById('adminPnr').value = item.pnr;
       document.getElementById('adminPnr').readOnly = true;
@@ -347,11 +350,10 @@
       document.getElementById('cancelEditBtn').classList.remove('hidden');
     }
 
-    function deleteRecord(pnr) {
-      if (!confirm(`PNR #${pnr} डिलीट करें?`)) return;
-      const records = getRecords();
-      delete records[pnr];
-      saveAllRecords(records);
+    async function deleteRecord(pnr) {
+      if (!confirm(`PNR #${pnr} को लाइव डेटाबेस से डिलीट करें?`)) return;
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, { method: 'DELETE' });
+      await renderAdminTable();
     }
 
     function resetAdminForm() {
@@ -361,22 +363,28 @@
       document.getElementById('cancelEditBtn').classList.add('hidden');
     }
 
-    function updateAllUpi() {
+    async function updateAllUpi() {
       const newUpi = document.getElementById('bulkUpiInput').value.trim();
       if (!newUpi) return alert('नई UPI ID लिखें।');
-      const records = getRecords();
-      Object.keys(records).forEach(k => records[k].upi = newUpi);
-      saveAllRecords(records);
+      const records = await fetchRecords();
+      for (const k of Object.keys(records)) {
+        await fetch(`${FIREBASE_URL}/pnr_records/${k}/upi.json`, {
+          method: 'PUT',
+          body: JSON.stringify(newUpi)
+        });
+      }
       document.getElementById('bulkUpiInput').value = '';
-      alert('सभी UPI ID अपडेट हो गईं!');
+      await renderAdminTable();
+      alert('सभी UPI ID लाइव अपडेट हो गईं!');
     }
 
-    function renderAdminTable() {
-      const records = getRecords();
+    async function renderAdminTable() {
+      const tbody = document.getElementById('recordsTableBody');
+      tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">डेटा लोड हो रहा है...</td></tr>`;
+      const records = await fetchRecords();
       const keys = Object.keys(records);
       document.getElementById('recordCount').textContent = keys.length;
-      const tbody = document.getElementById('recordsTableBody');
-      tbody.innerHTML = keys.length ? '' : `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">कोई रिकॉर्ड नहीं है।</td></tr>`;
+      tbody.innerHTML = keys.length ? '' : `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">अभी कोई लाइव PNR नहीं है। नया PNR जोड़ें।</td></tr>`;
       keys.forEach(k => {
         const item = records[k];
         tbody.innerHTML += `<tr><td class="py-3 px-4"><b class="text-[#001b94]">#${item.pnr}</b><div class="text-xs font-bold">${item.customerName || '-'}</div>${item.utr ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">UTR: ${item.utr}</span>` : ''}</td><td class="py-3 px-4"><span class="text-xs font-bold bg-slate-100 px-1.5 py-0.5 rounded">${item.flightNo || '-'}</span><div class="text-[11px] text-slate-600 mt-0.5">${item.flightTime || '-'}</div></td><td class="py-3 px-4"><b>₹${item.amount}</b><div class="font-mono text-[11px] text-slate-600 break-all">${item.upi}</div></td><td class="py-3 px-4 text-right whitespace-nowrap"><button type="button" onclick="editRecord('${item.pnr}')" class="bg-blue-50 text-[#001b94] font-bold text-xs px-2.5 py-1 rounded-lg mr-1">Edit</button><button type="button" onclick="deleteRecord('${item.pnr}')" class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-lg">Del</button></td></tr>`;
