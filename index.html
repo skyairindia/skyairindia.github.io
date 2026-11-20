@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyAir India - Official PNR Payment & E-Ticket Portal</title>
+  <title>SkyAir India - Official PNR Payment & E-Ticket Desk</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,6 +22,18 @@
 </head>
 <body class="min-h-screen flex flex-col text-slate-800">
 
+  <!-- TOP TRUST BAR -->
+  <div class="bg-slate-950 text-slate-300 text-[11px] py-1.5 px-4 no-print">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="flex items-center gap-1 text-emerald-400 font-bold">🔒 256-Bit SSL Encrypted</span>
+        <span class="hidden sm:inline text-slate-500">|</span>
+        <span class="hidden sm:inline">24x7 Instant PNR Verification & E-Ticket Issuance</span>
+      </div>
+      <div class="font-semibold text-sky-300">Support Desk: support@skyairindia.in</div>
+    </div>
+  </div>
+
   <!-- TOP NAVIGATION -->
   <header class="sky-gradient text-white shadow-lg sticky top-0 z-40 no-print">
     <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
@@ -30,9 +42,9 @@
         <div>
           <div class="flex items-center gap-1.5">
             <h1 class="font-extrabold text-lg sm:text-xl tracking-tight leading-none">SkyAir <span class="text-sky-300">India</span></h1>
-            <span class="bg-emerald-400/20 border border-emerald-300/40 text-emerald-200 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Official</span>
+            <span class="bg-emerald-400/20 border border-emerald-300/40 text-emerald-200 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Verified Desk</span>
           </div>
-          <p class="text-[11px] text-blue-200 tracking-wide mt-0.5">Instant PNR Payment & E-Ticket Desk</p>
+          <p class="text-[11px] text-blue-200 tracking-wide mt-0.5">Flight Booking, PNR Payment & E-Ticket Portal</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -44,20 +56,20 @@
     </div>
   </header>
 
-  <!-- HERO BANNER (CUSTOMER VIEW ONLY) -->
+  <!-- HERO BANNER -->
   <div id="heroBanner" class="sky-gradient text-white pt-6 pb-16 px-4 no-print">
     <div class="max-w-2xl mx-auto text-center">
       <span class="inline-flex items-center gap-1.5 bg-white/15 border border-white/20 text-sky-200 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 24x7 Automated PNR & Boarding Pass Desk
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Official Passenger Reservation & Payment Gateway
       </span>
-      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">अपना PNR चेक करें, पेमेंट करें और E-Ticket डाउनलोड करें</h2>
-      <p class="text-xs sm:text-sm text-blue-100 mt-2 max-w-md mx-auto">सुरक्षित UPI भुगतान और वेरिफिकेशन के तुरंत बाद अपना कन्फर्म फ्लाइट टिकट प्राप्त करें।</p>
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">अपना PNR स्टेटस जांचें, सुरक्षित पेमेंट करें और E-Ticket पाएं</h2>
+      <p class="text-xs sm:text-sm text-blue-100 mt-2 max-w-md mx-auto">अपना 6-अंकों का PNR नंबर दर्ज करके बुकिंग की पुष्टि करें और तुरंत डिजिटल बोर्डिंग पास डाउनलोड करें।</p>
     </div>
   </div>
 
   <main class="flex-grow max-w-5xl w-full mx-auto px-4 pb-10">
 
-    <!-- PIN SECTION (ONE-TIME LOGIN) -->
+    <!-- PIN SECTION -->
     <section id="pinSection" class="hidden max-w-sm mx-auto mt-8">
       <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 text-center">
         <div class="w-14 h-14 bg-blue-50 text-[#02135c] rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">🔐</div>
@@ -94,17 +106,20 @@
 
         <!-- Trust Badges -->
         <div class="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-slate-100 text-center">
-          <div class="bg-slate-50 rounded-xl p-2.5">
+          <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
             <div class="text-base">🛡️</div>
-            <p class="text-[10px] font-bold text-slate-600 mt-0.5">100% Secure UPI</p>
+            <p class="text-[10px] font-extrabold text-slate-700 mt-0.5">UPI Verified</p>
+            <p class="text-[9px] text-slate-400">Zero Hidden Fee</p>
           </div>
-          <div class="bg-slate-50 rounded-xl p-2.5">
+          <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
             <div class="text-base">⚡</div>
-            <p class="text-[10px] font-bold text-slate-600 mt-0.5">Instant E-Ticket</p>
+            <p class="text-[10px] font-extrabold text-slate-700 mt-0.5">Instant E-Ticket</p>
+            <p class="text-[9px] text-slate-400">PDF & QR Enabled</p>
           </div>
-          <div class="bg-slate-50 rounded-xl p-2.5">
-            <div class="text-base">✅</div>
-            <p class="text-[10px] font-bold text-slate-600 mt-0.5">Verified PNR</p>
+          <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
+            <div class="text-base">🎧</div>
+            <p class="text-[10px] font-extrabold text-slate-700 mt-0.5">24x7 Desk</p>
+            <p class="text-[9px] text-slate-400">Live Support</p>
           </div>
         </div>
       </div>
@@ -113,13 +128,13 @@
         <div class="bg-amber-50 border-b border-amber-100 px-6 py-3.5 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
-            <span class="text-xs font-extrabold text-amber-800 uppercase tracking-wide">Payment Pending</span>
+            <span class="text-xs font-extrabold text-amber-800 uppercase tracking-wide">Awaiting Payment</span>
           </div>
           <span id="displayPnrBadge" class="text-xs font-extrabold bg-white text-[#02135c] px-3 py-1 rounded-lg border border-amber-200 shadow-sm">PNR: #1001</span>
         </div>
 
         <div class="p-6 sm:p-8">
-          <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-6">
+          <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-5">
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">यात्री और फ्लाइट विवरण</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="bg-white p-3 rounded-xl border border-slate-100">
@@ -137,20 +152,33 @@
             </div>
           </div>
 
-          <div class="text-center bg-blue-50/70 border border-blue-100 rounded-2xl p-5 mb-6">
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">कुल देय राशि (Payable Amount)</p>
-            <div class="text-4xl font-extrabold text-[#02135c] mt-1">₹<span id="displayAmount">0</span></div>
-            <p id="displayNote" class="text-xs text-slate-600 mt-1.5 font-semibold"></p>
+          <!-- Transparent Fare Breakdown -->
+          <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-5 mb-6">
+            <div class="flex justify-between text-xs text-slate-600 mb-1.5">
+              <span>Base Fare & Airline Charges</span>
+              <span class="font-semibold">₹<span id="displayBaseFare">0</span></span>
+            </div>
+            <div class="flex justify-between text-xs text-slate-600 pb-2.5 border-b border-blue-200/60">
+              <span>Airport Taxes & Convenience Fee</span>
+              <span class="font-semibold">₹<span id="displayTaxFare">0</span></span>
+            </div>
+            <div class="flex items-center justify-between pt-2.5">
+              <div>
+                <p class="text-xs font-extrabold text-slate-700 uppercase">कुल देय राशि (Total Payable)</p>
+                <p id="displayNote" class="text-[11px] text-slate-500 font-medium mt-0.5"></p>
+              </div>
+              <div class="text-3xl font-extrabold text-[#02135c]">₹<span id="displayAmount">0</span></div>
+            </div>
           </div>
 
           <div class="text-center mb-6">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">किसी भी UPI ऐप से स्कैन करें</p>
             <div id="qrcode" class="inline-block shadow-sm"></div>
-            <p class="text-[11px] text-slate-400 mt-2">GPay • PhonePe • Paytm • BHIM</p>
+            <p class="text-[11px] text-slate-400 mt-2">GPay • PhonePe • Paytm • BHIM • Cred</p>
           </div>
 
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5">
-            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">UPI ID पर सीधे भुगतान करें</label>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Official Merchant UPI ID</label>
             <div class="flex items-center justify-between gap-2">
               <span id="displayUpiId" class="font-mono font-bold text-sm sm:text-base text-slate-900 break-all">merchant@upi</span>
               <button type="button" onclick="copyUpi()" id="copyBtn" class="shrink-0 bg-[#02135c] text-white text-xs font-bold px-3.5 py-2 rounded-lg">Copy UPI</button>
@@ -160,12 +188,12 @@
           <a id="upiIntentLink" href="#" class="block w-full text-center bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-md text-sm mb-6">📲 मोबाइल UPI ऐप से सीधे पेमेंट करें</a>
 
           <div class="border-t border-slate-200 pt-5">
-            <p class="text-xs font-bold text-slate-700 mb-2">पेमेंट करने के बाद 12-अंकों का UTR नंबर दर्ज करें:</p>
+            <p class="text-xs font-bold text-slate-700 mb-2">पेमेंट करने के बाद 12-अंकों का UTR / Ref नंबर दर्ज करें:</p>
             <form onsubmit="submitUtr(event)" class="flex gap-2">
               <input type="text" id="utrInput" placeholder="12-अंकों का UTR नंबर" required class="flex-grow px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono" />
-              <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0">Submit UTR</button>
+              <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0">Verify UTR</button>
             </form>
-            <div id="utrSuccessMsg" class="hidden mt-3 bg-blue-50 border border-blue-200 text-[#02135c] text-xs font-semibold p-3 rounded-xl">⏳ आपका UTR सबमिट हो गया है! वेरिफिकेशन पूरा होते ही इसी PNR पर आपका E-Ticket खुल जाएगा।</div>
+            <div id="utrSuccessMsg" class="hidden mt-3 bg-blue-50 border border-blue-200 text-[#02135c] text-xs font-semibold p-3 rounded-xl">⏳ आपका UTR सफलतापूर्वक दर्ज हो गया है! वेरिफिकेशन पूरा होते ही इसी PNR पर आपका E-Ticket डाउनलोड के लिए खुल जाएगा।</div>
           </div>
         </div>
       </div>
@@ -263,14 +291,13 @@
           </button>
         </div>
       </div>
-
     </section>
-        <!-- ADMIN VIEW WITH DASHBOARD STATS -->
+        <!-- ADMIN VIEW WITH EDITABLE PNR -->
     <section id="adminView" class="hidden no-print mt-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-extrabold text-slate-900">Admin Control Dashboard</h2>
-          <p class="text-xs sm:text-sm text-slate-500">ऑटो-लॉगिन सक्रिय है • नया PNR जोड़ें, UTR जांचें और E-Ticket जारी करें।</p>
+          <p class="text-xs sm:text-sm text-slate-500">ऑटो-लॉगिन सक्रिय है • नया PNR जोड़ें, PNR एडिट करें और E-Ticket जारी करें।</p>
         </div>
         <button type="button" onclick="switchView('customer')" class="self-start sm:self-auto bg-white border border-slate-300 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">← ग्राहक पेज देखें</button>
       </div>
@@ -295,10 +322,11 @@
         <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-fit">
           <h3 id="formHeading" class="text-base font-extrabold text-slate-900 mb-3 flex items-center gap-2"><span>➕</span> नया PNR / E-Ticket जोड़ें</h3>
           <form onsubmit="saveRecord(event)" class="space-y-2.5 text-xs">
+            <input type="hidden" id="originalPnrKey" value="" />
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="block font-bold text-slate-600 mb-1">PNR Number *</label>
-                <input type="text" id="adminPnr" placeholder="P7P8JI" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold uppercase" />
+                <label class="block font-bold text-slate-600 mb-1">PNR Number (Editable) *</label>
+                <input type="text" id="adminPnr" placeholder="P7P8JI" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold uppercase focus:border-[#02135c] focus:outline-none" />
               </div>
               <div>
                 <label class="block font-bold text-slate-600 mb-1">स्टेटस *</label>
@@ -430,8 +458,32 @@
     </section>
   </main>
 
-  <footer class="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-400 no-print">
-    <p class="font-semibold text-slate-500">© 2026 SkyAir India • Instant PNR Payment & E-Ticket Portal</p>
+  <!-- PROFESSIONAL CORPORATE FOOTER -->
+  <footer class="bg-slate-900 text-slate-300 py-8 px-4 mt-8 no-print">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs border-b border-slate-800 pb-6">
+      <div>
+        <div class="flex items-center gap-2 text-white font-extrabold text-base mb-2">
+          <span>✈️</span><span>SkyAir India</span>
+        </div>
+        <p class="text-slate-400 leading-relaxed">Authorized Domestic & International Air Ticketing, Instant PNR Verification & Digital Boarding Pass Desk.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold uppercase tracking-wider mb-2">Passenger Guarantees</h4>
+        <ul class="space-y-1.5 text-slate-400">
+          <li>✓ Instant E-Ticket & QR Generation</li>
+          <li>✓ Direct UPI Merchant Settlement</li>
+          <li>✓ 24x7 PNR & Schedule Support</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold uppercase tracking-wider mb-2">Compliance & Security</h4>
+        <p class="text-slate-400 leading-relaxed">All payments are processed via RBI-authorized UPI gateways. Carry a valid Govt. Photo ID at the airport.</p>
+      </div>
+    </div>
+    <div class="max-w-5xl mx-auto pt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+      <span>© 2026 SkyAir India Aviation Services. All Rights Reserved.</span>
+      <span>Verified Portal • PCI-DSS & SSL Compliant</span>
+    </div>
   </footer>
     <script>
     const FIREBASE_URL = 'https://skyindia-db91c-default-rtdb.firebaseio.com';
@@ -502,17 +554,23 @@
           return;
         }
 
+        const totalAmt = Number(item.amount || 0);
+        const taxAmt = Math.round(totalAmt * 0.12);
+        const baseAmt = totalAmt - taxAmt;
+
         document.getElementById('boardingPassCard').classList.add('hidden');
         document.getElementById('paymentResultCard').classList.remove('hidden');
         document.getElementById('displayPnrBadge').textContent = `PNR: #${item.pnr}`;
         document.getElementById('displayCustomerName').textContent = item.customerName || 'N/A';
         document.getElementById('displayFlightNo').textContent = item.flightNo || 'N/A';
         document.getElementById('displayFlightTime').textContent = item.depTime || item.flightDate || 'N/A';
-        document.getElementById('displayAmount').textContent = Number(item.amount).toLocaleString('en-IN');
+        document.getElementById('displayBaseFare').textContent = baseAmt.toLocaleString('en-IN');
+        document.getElementById('displayTaxFare').textContent = taxAmt.toLocaleString('en-IN');
+        document.getElementById('displayAmount').textContent = totalAmt.toLocaleString('en-IN');
         document.getElementById('displayUpiId').textContent = item.upi;
         document.getElementById('displayNote').textContent = `${item.fromCity || ''} → ${item.toCity || ''} (${item.sector || ''})`;
 
-        const upiUri = `upi://pay?pa=${encodeURIComponent(item.upi)}&pn=${encodeURIComponent('SkyAir India')}&am=${item.amount}&cu=INR&tn=${encodeURIComponent('PNR ' + item.pnr)}`;
+        const upiUri = `upi://pay?pa=${encodeURIComponent(item.upi)}&pn=${encodeURIComponent('SkyAir India')}&am=${totalAmt}&cu=INR&tn=${encodeURIComponent('PNR ' + item.pnr)}`;
         document.getElementById('upiIntentLink').href = upiUri;
 
         const qrContainer = document.getElementById('qrcode');
@@ -588,13 +646,16 @@
 
     async function saveRecord(e) {
       e.preventDefault();
-      const pnr = document.getElementById('adminPnr').value.trim().toUpperCase();
+      const oldPnr = document.getElementById('originalPnrKey').value.trim().toUpperCase();
+      const newPnr = document.getElementById('adminPnr').value.trim().toUpperCase();
+      const existingData = cachedRecords[oldPnr] || cachedRecords[newPnr] || {};
       const nowStr = new Date().toUTCString().slice(5, 22);
+
       const payload = {
-        pnr,
+        pnr: newPnr,
         status: document.getElementById('adminStatus').value,
-        bookingDate: cachedRecords[pnr] ? (cachedRecords[pnr].bookingDate || nowStr) : nowStr,
-        customerName: document.getElementById('adminCustomerName').value.trim(),
+        bookingDate: existingData.bookingDate || nowStr,
+                customerName: document.getElementById('adminCustomerName').value.trim(),
         paxMeta: document.getElementById('adminPaxMeta').value.trim() || 'Adult | Male |',
         sector: document.getElementById('adminSector').value.trim().toUpperCase(),
         seat: document.getElementById('adminSeat').value.trim() || '16F(Window)',
@@ -611,12 +672,18 @@
         arrTime: document.getElementById('adminArrTime').value.trim(),
         amount: Number(document.getElementById('adminAmount').value),
         upi: document.getElementById('adminUpi').value.trim(),
-        utr: cachedRecords[pnr] ? (cachedRecords[pnr].utr || '') : ''
+        utr: existingData.utr || ''
       };
-      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+
+      await fetch(`${FIREBASE_URL}/pnr_records/${newPnr}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+
+      if (oldPnr && oldPnr !== newPnr) {
+        await fetch(`${FIREBASE_URL}/pnr_records/${oldPnr}.json`, { method: 'DELETE' });
+      }
+
       resetAdminForm();
       await renderAdminTable();
-      alert(`PNR #${pnr} सेव हो गया!`);
+      alert(`PNR #${newPnr} सफलतापूर्वक सेव/अपडेट हो गया!`);
     }
 
     async function confirmTicket(pnr) {
@@ -632,12 +699,12 @@
       document.getElementById('pnrInput').value = pnr;
       renderBoardingPass(item);
     }
-
-    function editRecord(pnr) {
+          function editRecord(pnr) {
       const item = cachedRecords[pnr];
       if (!item) return;
+      document.getElementById('originalPnrKey').value = item.pnr;
       document.getElementById('adminPnr').value = item.pnr;
-      document.getElementById('adminPnr').readOnly = true;
+      document.getElementById('adminPnr').readOnly = false;
       document.getElementById('adminStatus').value = item.status || 'pending';
       document.getElementById('adminCustomerName').value = item.customerName || '';
       document.getElementById('adminPaxMeta').value = item.paxMeta || '';
@@ -656,7 +723,7 @@
       document.getElementById('adminArrTime').value = item.arrTime || '';
       document.getElementById('adminAmount').value = item.amount;
       document.getElementById('adminUpi').value = item.upi;
-      document.getElementById('formHeading').innerHTML = `<span>✏️</span> PNR #${item.pnr} अपडेट करें`;
+      document.getElementById('formHeading').innerHTML = `<span>✏️</span> PNR #${item.pnr} एडिट करें`;
       document.getElementById('cancelEditBtn').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -668,6 +735,7 @@
     }
 
     function resetAdminForm() {
+      document.getElementById('originalPnrKey').value = '';
       ['adminPnr','adminCustomerName','adminPaxMeta','adminSector','adminSeat','adminAddon','adminFlightNo','adminFlightDate','adminBagDrop','adminDuration','adminFromCity','adminToCity','adminFromAirport','adminToAirport','adminDepTime','adminArrTime','adminAmount','adminUpi'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('adminStatus').value = 'pending';
       document.getElementById('adminPnr').readOnly = false;
@@ -731,3 +799,5 @@
   </script>
 </body>
 </html>
+
+        
