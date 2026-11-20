@@ -420,4 +420,136 @@
         resultCard.classList.remove('hidden');
 
         document.getElementById('displayPnrBadge').textContent = `PNR: #${item.pnr}`;
-        document.getElementById('d
+        document.getElementById('displayCustomerName').textContent = item.customerName || 'N/A';
+        document.getElementById('displayFlightNo').textContent = item.flightNo || 'N/A';
+        document.getElementById('displayFlightTime').textContent = item.flightTime || 'N/A';
+        document.getElementById('displayAmount').textContent = Number(item.amount).toLocaleString('en-IN');
+        document.getElementById('displayUpiId').textContent = item.upi;
+        document.getElementById('displayNote').textContent = item.note || 'Flight Ticket Payment';
+
+        const upiUri = `upi://pay?pa=${encodeURIComponent(item.upi)}&pn=${encodeURIComponent('SkyIndia Pay')}&am=${item.amount}&cu=INR&tn=${encodeURIComponent('PNR ' + item.pnr)}`;
+        document.getElementById('upiIntentLink').href = upiUri;
+
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrContainer, { text: upiUri, width: 170, height: 170, colorDark: "#001b94", colorLight: "#ffffff" });
+        }
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        resultCard.classList.add('hidden');
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function copyUpi() {
+      navigator.clipboard.writeText(document.getElementById('displayUpiId').textContent);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = 'Copy UPI'; }, 2000);
+    }
+
+    function submitUtr(e) {
+      e.preventDefault();
+      const utr = document.getElementById('utrInput').value.trim();
+      const pnr = document.getElementById('displayPnrBadge').textContent.replace('PNR: #', '');
+      const records = getRecords();
+      if (records[pnr]) { records[pnr].utr = utr; saveAllRecords(records); }
+      document.getElementById('utrSuccessMsg').classList.remove('hidden');
+    }
+
+    function switchView(view) {
+      document.getElementById('customerView').classList.add('hidden');
+      document.getElementById('pinSection').classList.add('hidden');
+      document.getElementById('adminView').classList.add('hidden');
+      if (view === 'pin') document.getElementById('pinSection').classList.remove('hidden');
+      else if (view === 'admin') { document.getElementById('adminView').classList.remove('hidden'); renderAdminTable(); }
+      else document.getElementById('customerView').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openAdminAuth() {
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinError').classList.add('hidden');
+      switchView('pin');
+    }
+
+    function verifyPin(e) {
+      e.preventDefault();
+      if (document.getElementById('pinInput').value.trim() === ADMIN_PIN) switchView('admin');
+      else document.getElementById('pinError').classList.remove('hidden');
+    }
+
+    function saveRecord(e) {
+      e.preventDefault();
+      const pnr = document.getElementById('adminPnr').value.trim().toUpperCase();
+      const records = getRecords();
+      records[pnr] = {
+        pnr,
+        customerName: document.getElementById('adminCustomerName').value.trim(),
+        flightNo: document.getElementById('adminFlightNo').value.trim().toUpperCase(),
+        flightTime: document.getElementById('adminFlightTime').value.trim(),
+        amount: Number(document.getElementById('adminAmount').value),
+        upi: document.getElementById('adminUpi').value.trim(),
+        note: document.getElementById('adminNote').value.trim(),
+        utr: records[pnr] ? records[pnr].utr : ''
+      };
+      saveAllRecords(records);
+      resetAdminForm();
+      alert(`PNR #${pnr} सेव हो गया!`);
+    }
+
+    function editRecord(pnr) {
+      const item = getRecords()[pnr];
+      if (!item) return;
+      document.getElementById('adminPnr').value = item.pnr;
+      document.getElementById('adminPnr').readOnly = true;
+      document.getElementById('adminCustomerName').value = item.customerName || '';
+      document.getElementById('adminFlightNo').value = item.flightNo || '';
+      document.getElementById('adminFlightTime').value = item.flightTime || '';
+      document.getElementById('adminAmount').value = item.amount;
+      document.getElementById('adminUpi').value = item.upi;
+      document.getElementById('adminNote').value = item.note || '';
+      document.getElementById('formHeading').innerHTML = `<span>✏️</span> PNR #${item.pnr} अपडेट करें`;
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+    }
+
+    function deleteRecord(pnr) {
+      if (!confirm(`PNR #${pnr} डिलीट करें?`)) return;
+      const records = getRecords();
+      delete records[pnr];
+      saveAllRecords(records);
+    }
+
+    function resetAdminForm() {
+      ['adminPnr','adminCustomerName','adminFlightNo','adminFlightTime','adminAmount','adminUpi','adminNote'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('adminPnr').readOnly = false;
+      document.getElementById('formHeading').innerHTML = `<span>➕</span> नया PNR Number जोड़ें`;
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+    }
+
+    function updateAllUpi() {
+      const newUpi = document.getElementById('bulkUpiInput').value.trim();
+      if (!newUpi) return alert('नई UPI ID लिखें।');
+      const records = getRecords();
+      Object.keys(records).forEach(k => records[k].upi = newUpi);
+      saveAllRecords(records);
+      document.getElementById('bulkUpiInput').value = '';
+      alert('सभी UPI ID अपडेट हो गईं!');
+    }
+
+    function renderAdminTable() {
+      const records = getRecords();
+      const keys = Object.keys(records);
+      document.getElementById('recordCount').textContent = keys.length;
+      const tbody = document.getElementById('recordsTableBody');
+      tbody.innerHTML = keys.length ? '' : `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">कोई रिकॉर्ड नहीं है।</td></tr>`;
+      keys.forEach(k => {
+        const item = records[k];
+        tbody.innerHTML += `<tr><td class="py-3 px-4"><b class="text-[#001b94]">#${item.pnr}</b><div class="text-xs font-bold">${item.customerName || '-'}</div>${item.utr ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">UTR: ${item.utr}</span>` : ''}</td><td class="py-3 px-4"><span class="text-xs font-bold bg-slate-100 px-1.5 py-0.5 rounded">${item.flightNo || '-'}</span><div class="text-[11px] text-slate-600 mt-0.5">${item.flightTime || '-'}</div></td><td class="py-3 px-4"><b>₹${item.amount}</b><div class="font-mono text-[11px] text-slate-600 break-all">${item.upi}</div></td><td class="py-3 px-4 text-right whitespace-nowrap"><button type="button" onclick="editRecord('${item.pnr}')" class="bg-blue-50 text-[#001b94] font-bold text-xs px-2.5 py-1 rounded-lg mr-1">Edit</button><button type="button" onclick="deleteRecord('${item.pnr}')" class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-lg">Del</button></td></tr>`;
+      });
+    }
+  </script>
+</body>
+</html>
+
