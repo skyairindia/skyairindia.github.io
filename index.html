@@ -3,25 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyIndia Pay - PNR Payment Portal</title>
+  <title>SkyIndia Pay - PNR & E-Boarding Pass</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
     .indigo-gradient { background: linear-gradient(135deg, #001b94 0%, #0033cc 100%); }
-    #qrcode img, #qrcode canvas { margin: 0 auto; border-radius: 12px; padding: 8px; background: white; border: 1px solid #e2e8f0; }
+    #qrcode img, #qrcode canvas, #ticketQr img, #ticketQr canvas { margin: 0 auto; border-radius: 10px; padding: 6px; background: white; border: 1px solid #e2e8f0; }
+    .ticket-notch-left, .ticket-notch-right { position: absolute; width: 24px; height: 24px; background-color: #f1f5f9; border-radius: 9999px; top: 50%; transform: translateY(-50%); }
+    .ticket-notch-left { left: -12px; }
+    .ticket-notch-right { right: -12px; }
+    @media print {
+      body * { visibility: hidden; }
+      #boardingPassCard, #boardingPassCard * { visibility: visible; }
+      #boardingPassCard { position: fixed; left: 0; top: 0; width: 100%; box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col text-slate-800">
 
-  <header class="indigo-gradient text-white shadow-lg sticky top-0 z-40">
+  <header class="indigo-gradient text-white shadow-lg sticky top-0 z-40 no-print">
     <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-2.5 cursor-pointer" onclick="switchView('customer')">
         <div class="bg-white text-[#001b94] p-2 rounded-xl font-extrabold text-lg leading-none shadow-sm">✈️</div>
         <div>
           <h1 class="font-extrabold text-lg tracking-tight leading-none">SkyIndia <span class="text-sky-300">Pay</span></h1>
-          <p class="text-[11px] text-blue-200 tracking-wide mt-0.5">Instant PNR Payment Portal</p>
+          <p class="text-[11px] text-blue-200 tracking-wide mt-0.5">PNR Payment & E-Ticket Desk</p>
         </div>
       </div>
       <button type="button" onclick="openAdminAuth()" class="bg-white/20 active:bg-white/30 border border-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5">
@@ -51,19 +60,19 @@
 
     <!-- CUSTOMER VIEW -->
     <section id="customerView" class="max-w-lg mx-auto">
-      <div class="bg-white rounded-2xl shadow-md border border-slate-200/80 p-6 sm:p-8">
+      <div class="bg-white rounded-2xl shadow-md border border-slate-200/80 p-6 sm:p-8 no-print">
         <div class="text-center mb-6">
-          <span class="inline-block bg-blue-50 text-[#001b94] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Official Payment Desk</span>
+          <span class="inline-block bg-blue-50 text-[#001b94] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Official Flight Desk</span>
           <h2 class="text-2xl font-extrabold text-slate-900">अपना PNR Number दर्ज करें</h2>
-          <p class="text-sm text-slate-500 mt-1">बुकिंग की जानकारी, टिकट राशि और UPI पेमेंट विवरण देखने के लिए अपना PNR नंबर डालें।</p>
+          <p class="text-sm text-slate-500 mt-1">पेमेंट करने या कन्फर्म ई-टिकट (Boarding Pass) देखने के लिए PNR नंबर डालें।</p>
         </div>
 
         <form onsubmit="handleLookup(event)" class="space-y-4">
           <div>
             <label for="pnrInput" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">PNR Number</label>
-            <input type="text" id="pnrInput" placeholder="उदाहरण: 1001 या SKY202" required class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-[#001b94] focus:outline-none text-base font-bold tracking-wider uppercase text-slate-900" />
+            <input type="text" id="pnrInput" placeholder="उदाहरण: SKY202" required class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-[#001b94] focus:outline-none text-base font-bold tracking-wider uppercase text-slate-900" />
           </div>
-          <button type="submit" class="w-full indigo-gradient text-white font-bold py-3.5 rounded-xl shadow-md text-base">विवरण देखें (Proceed to Pay) →</button>
+          <button type="submit" class="w-full indigo-gradient text-white font-bold py-3.5 rounded-xl shadow-md text-base">PNR विवरण देखें →</button>
         </form>
 
         <div id="errorAlert" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
@@ -71,14 +80,14 @@
         </div>
       </div>
 
-      <!-- PAYMENT RESULT CARD -->
+      <!-- PAYMENT RESULT CARD (WHEN PENDING) -->
       <div id="paymentResultCard" class="hidden mt-6 bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden">
-        <div class="bg-emerald-50 border-b border-emerald-100 px-6 py-3 flex items-center justify-between">
+        <div class="bg-amber-50 border-b border-amber-100 px-6 py-3 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">PNR Verified</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-amber-800 uppercase tracking-wide">Payment Pending</span>
           </div>
-          <span id="displayPnrBadge" class="text-xs font-extrabold bg-white text-[#001b94] px-2.5 py-1 rounded-lg border border-emerald-200">PNR: #1001</span>
+          <span id="displayPnrBadge" class="text-xs font-extrabold bg-white text-[#001b94] px-2.5 py-1 rounded-lg border border-amber-200">PNR: #1001</span>
         </div>
 
         <div class="p-6 sm:p-8">
@@ -128,17 +137,102 @@
               <input type="text" id="utrInput" placeholder="UTR नंबर डालें" required class="flex-grow px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm" />
               <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0">Submit UTR</button>
             </form>
-            <div id="utrSuccessMsg" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold p-3 rounded-xl">✅ धन्यवाद! आपका UTR नंबर सबमिट हो गया है।</div>
+            <div id="utrSuccessMsg" class="hidden mt-3 bg-blue-50 border border-blue-200 text-[#001b94] text-xs font-semibold p-3 rounded-xl">⏳ आपका UTR सबमिट हो गया है! Admin द्वारा वेरिफाई होते ही इसी PNR पर आपका IndiGo E-Boarding Pass डाउनलोड के लिए खुल जाएगा।</div>
           </div>
         </div>
       </div>
+
+      <!-- INDIGO STYLE E-BOARDING PASS CARD (WHEN CONFIRMED) -->
+      <div id="boardingPassCard" class="hidden mt-6 bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+        <!-- Top Indigo Header -->
+        <div class="indigo-gradient text-white px-6 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="bg-white text-[#001b94] w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-lg">✈️</div>
+            <div>
+              <h3 class="font-extrabold text-base tracking-wide uppercase leading-none">SkyIndia <span class="text-sky-300">Airlines</span></h3>
+              <p class="text-[10px] text-blue-200 tracking-widest uppercase mt-0.5">E-Ticket / Boarding Pass</p>
+            </div>
+          </div>
+          <span class="bg-emerald-400 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">✓ Confirmed</span>
+        </div>
+
+        <!-- Route Banner -->
+        <div class="bg-blue-50/70 px-6 py-5 border-b border-blue-100">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sector / Route</p>
+          <div class="flex items-center justify-between gap-2">
+            <h4 id="tktRoute" class="text-lg sm:text-xl font-extrabold text-[#001b94] tracking-tight">DELHI (DEL) → MUMBAI (BOM)</h4>
+            <span class="text-2xl text-[#001b94]">🛫</span>
+          </div>
+        </div>
+
+        <!-- Passenger & Flight Grid -->
+        <div class="p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Passenger Name (यात्री)</p>
+              <p id="tktPassenger" class="text-base sm:text-lg font-extrabold text-slate-900 uppercase mt-0.5">RAHUL SHARMA</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PNR Number</p>
+              <p id="tktPnr" class="text-base sm:text-lg font-mono font-extrabold text-[#001b94] bg-blue-50 px-2.5 py-0.5 rounded-lg mt-0.5">SKY202</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Flight</p>
+              <p id="tktFlight" class="text-sm font-extrabold text-[#001b94] mt-0.5">6E-2045</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Date & Time</p>
+              <p id="tktTime" class="text-xs font-extrabold text-slate-900 mt-0.5">22 Nov, 10:30 AM</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Seat</p>
+              <p id="tktSeat" class="text-sm font-extrabold text-slate-900 mt-0.5">12A</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Gate</p>
+              <p id="tktGate" class="text-sm font-extrabold text-emerald-700 mt-0.5">G-04</p>
+            </div>
+          </div>
+
+          <!-- Tear-off Perforated Line -->
+          <div class="relative py-2">
+            <div class="border-t-2 border-dashed border-slate-300"></div>
+            <div class="ticket-notch-left"></div>
+            <div class="ticket-notch-right"></div>
+          </div>
+
+          <!-- Bottom QR & Fare Summary -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+            <div class="text-center sm:text-left space-y-1.5">
+              <span class="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded">PAID • ₹<span id="tktAmount">4500</span></span>
+              <p class="text-[11px] text-slate-500 font-mono">UTR Ref: <span id="tktUtr" class="font-bold text-slate-800">VERIFIED</span></p>
+              <p class="text-[10px] text-slate-400 max-w-[230px]">बोर्डिंग गेट प्रस्थान से 25 मिनट पहले बंद हो जाता है। कृपया वैध फोटो पहचान पत्र साथ रखें।</p>
+            </div>
+            <div class="text-center shrink-0">
+              <div id="ticketQr" class="inline-block"></div>
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Scan at Boarding Gate</p>
+            </div>
+          </div>
+
+          <!-- Print / Download Button -->
+          <div class="pt-3 flex gap-2.5 no-print">
+            <button type="button" onclick="window.print()" class="w-full indigo-gradient text-white font-bold py-3.5 rounded-xl shadow-md text-sm flex items-center justify-center gap-2">
+              🖨️ E-Ticket डाउनलोड / प्रिंट करें (Save PDF)
+            </button>
+          </div>
+        </div>
+      </div>
+
     </section>
         <!-- ADMIN VIEW -->
-    <section id="adminView" class="hidden">
+    <section id="adminView" class="hidden no-print">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-extrabold text-slate-900">Admin Control Panel</h2>
-          <p class="text-sm text-slate-500">यहाँ से नया PNR जोड़ें या किसी भी पुराने PNR की जानकारी और राशि बदलें।</p>
+          <p class="text-sm text-slate-500">यहाँ से नया PNR जोड़ें, पेमेंट Confirm करें और E-Ticket जारी करें।</p>
         </div>
         <button type="button" onclick="switchView('customer')" class="self-start sm:self-auto bg-white border border-slate-300 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">← ग्राहक पेज पर वापस जाएं</button>
       </div>
@@ -146,10 +240,19 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-fit">
           <h3 id="formHeading" class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2"><span>➕</span> नया PNR Number जोड़ें</h3>
-          <form onsubmit="saveRecord(event)" class="space-y-3.5">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">PNR Number *</label>
-              <input type="text" id="adminPnr" placeholder="जैसे: 1005 या PNR789" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold uppercase" />
+          <form onsubmit="saveRecord(event)" class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">PNR Number *</label>
+                <input type="text" id="adminPnr" placeholder="जैसे: SKY202" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold uppercase" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">टिकट स्टेटस *</label>
+                <select id="adminStatus" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-bold bg-white">
+                  <option value="pending">⏳ Pending (Payment)</option>
+                  <option value="confirmed">✅ Confirmed (Ticket)</option>
+                </select>
+              </div>
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">ग्राहक का नाम *</label>
@@ -165,17 +268,29 @@
                 <input type="text" id="adminFlightTime" placeholder="जैसे: 22 Nov, 10:30 AM" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
               </div>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">राशि / Amount (₹ में) *</label>
-              <input type="number" id="adminAmount" placeholder="जैसे: 4500" min="1" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold" />
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">सीट नंबर (Seat)</label>
+                <input type="text" id="adminSeat" placeholder="जैसे: 12A" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold uppercase" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">गेट नंबर (Gate)</label>
+                <input type="text" id="adminGate" placeholder="जैसे: G-04" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold uppercase" />
+              </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">आपकी UPI ID *</label>
-              <input type="text" id="adminUpi" placeholder="जैसे: skyindia@okicici" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono" />
+              <label class="block text-xs font-bold text-slate-600 mb-1">रूट (Route) *</label>
+              <input type="text" id="adminNote" placeholder="जैसे: Delhi (DEL) → Mumbai (BOM)" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">अतिरिक्त नोट / रूट</label>
-              <input type="text" id="adminNote" placeholder="जैसे: Delhi → Mumbai" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm" />
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">राशि (₹ में) *</label>
+                <input type="number" id="adminAmount" placeholder="4500" min="1" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">आपकी UPI ID *</label>
+                <input type="text" id="adminUpi" placeholder="skyindia@okicici" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono" />
+              </div>
             </div>
             <div class="pt-2 flex gap-2">
               <button type="submit" class="flex-grow indigo-gradient text-white font-bold py-3 rounded-xl text-sm shadow-sm">💾 सेव / अपडेट करें</button>
@@ -183,7 +298,7 @@
             </div>
           </form>
 
-          <div class="mt-6 pt-5 border-t border-slate-200">
+          <div class="mt-5 pt-4 border-t border-slate-200">
             <label class="block text-xs font-bold text-slate-600 mb-1.5">सभी PNR की UPI ID एक साथ बदलें:</label>
             <div class="flex gap-2">
               <input type="text" id="bulkUpiInput" placeholder="नई UPI ID डालें" class="flex-grow px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono" />
@@ -195,15 +310,15 @@
         <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
             <h3 class="font-extrabold text-slate-800 text-sm">सक्रिय PNR लिस्ट (<span id="recordCount">0</span>)</h3>
-            <span class="text-[11px] text-slate-500">Edit दबाकर कभी भी बदलें</span>
+            <span class="text-[11px] text-slate-500">Confirm दबाते ही E-Ticket लाइव होगा</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase bg-slate-50/50">
-                  <th class="py-3 px-4">PNR & ग्राहक</th>
-                  <th class="py-3 px-4">फ्लाइट</th>
-                  <th class="py-3 px-4">राशि & UPI</th>
+                  <th class="py-3 px-4">PNR & यात्री</th>
+                  <th class="py-3 px-4">फ्लाइट & स्टेटस</th>
+                  <th class="py-3 px-4">राशि</th>
                   <th class="py-3 px-4 text-right">एक्शन</th>
                 </tr>
               </thead>
@@ -215,7 +330,7 @@
     </section>
   </main>
 
-  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">© 2026 SkyIndia Pay</footer>
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 no-print">© 2026 SkyIndia Airlines & Pay</footer>
 
   <script>
     const FIREBASE_URL = 'https://skyindia-db91c-default-rtdb.firebaseio.com';
@@ -234,14 +349,36 @@
       }
     }
 
+    function renderBoardingPass(item) {
+      document.getElementById('paymentResultCard').classList.add('hidden');
+      document.getElementById('boardingPassCard').classList.remove('hidden');
+      document.getElementById('tktRoute').textContent = item.note || 'DOMESTIC FLIGHT';
+      document.getElementById('tktPassenger').textContent = item.customerName || 'PASSENGER';
+      document.getElementById('tktPnr').textContent = item.pnr;
+      document.getElementById('tktFlight').textContent = item.flightNo || '6E-101';
+      document.getElementById('tktTime').textContent = item.flightTime || '-';
+      document.getElementById('tktSeat').textContent = item.seat || '14A';
+      document.getElementById('tktGate').textContent = item.gate || 'G-02';
+      document.getElementById('tktAmount').textContent = Number(item.amount).toLocaleString('en-IN');
+      document.getElementById('tktUtr').textContent = item.utr || 'CONFIRMED';
+
+      const qrBox = document.getElementById('ticketQr');
+      qrBox.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: `SKYINDIA|PNR:${item.pnr}|PAX:${item.customerName}|FLT:${item.flightNo}|SEAT:${item.seat || '14A'}`,
+          width: 110, height: 110, colorDark: "#001b94", colorLight: "#ffffff"
+        });
+      }
+    }
+
     async function handleLookup(e) {
       e.preventDefault();
       const rawPnr = document.getElementById('pnrInput').value.trim().toUpperCase();
       const btn = e.target.querySelector('button[type="submit"]');
       if (btn) btn.textContent = 'खोज रहे हैं...';
-
       const records = await fetchRecords();
-      if (btn) btn.textContent = 'विवरण देखें (Proceed to Pay) →';
+      if (btn) btn.textContent = 'PNR विवरण देखें →';
 
       document.getElementById('utrSuccessMsg').classList.add('hidden');
       document.getElementById('utrInput').value = '';
@@ -249,6 +386,13 @@
       if (records[rawPnr]) {
         const item = records[rawPnr];
         document.getElementById('errorAlert').classList.add('hidden');
+
+        if (item.status === 'confirmed') {
+          renderBoardingPass(item);
+          return;
+        }
+
+        document.getElementById('boardingPassCard').classList.add('hidden');
         document.getElementById('paymentResultCard').classList.remove('hidden');
         document.getElementById('displayPnrBadge').textContent = `PNR: #${item.pnr}`;
         document.getElementById('displayCustomerName').textContent = item.customerName || 'N/A';
@@ -268,6 +412,7 @@
         }
       } else {
         document.getElementById('paymentResultCard').classList.add('hidden');
+        document.getElementById('boardingPassCard').classList.add('hidden');
         document.getElementById('errorAlert').classList.remove('hidden');
       }
     }
@@ -283,10 +428,7 @@
       e.preventDefault();
       const utr = document.getElementById('utrInput').value.trim();
       const pnr = document.getElementById('displayPnrBadge').textContent.replace('PNR: #', '');
-      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}/utr.json`, {
-        method: 'PUT',
-        body: JSON.stringify(utr)
-      });
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}/utr.json`, { method: 'PUT', body: JSON.stringify(utr) });
       document.getElementById('utrSuccessMsg').classList.remove('hidden');
     }
 
@@ -299,11 +441,7 @@
       else document.getElementById('customerView').classList.remove('hidden');
     }
 
-    function openAdminAuth() {
-      document.getElementById('pinInput').value = '';
-      document.getElementById('pinError').classList.add('hidden');
-      switchView('pin');
-    }
+    function openAdminAuth() { document.getElementById('pinInput').value = ''; document.getElementById('pinError').classList.add('hidden'); switchView('pin'); }
 
     function verifyPin(e) {
       e.preventDefault();
@@ -316,23 +454,35 @@
       const pnr = document.getElementById('adminPnr').value.trim().toUpperCase();
       const payload = {
         pnr,
+        status: document.getElementById('adminStatus').value,
         customerName: document.getElementById('adminCustomerName').value.trim(),
         flightNo: document.getElementById('adminFlightNo').value.trim().toUpperCase(),
         flightTime: document.getElementById('adminFlightTime').value.trim(),
+        seat: document.getElementById('adminSeat').value.trim().toUpperCase() || '12A',
+        gate: document.getElementById('adminGate').value.trim().toUpperCase() || 'G-02',
         amount: Number(document.getElementById('adminAmount').value),
         upi: document.getElementById('adminUpi').value.trim(),
         note: document.getElementById('adminNote').value.trim(),
         utr: cachedRecords[pnr] ? (cachedRecords[pnr].utr || '') : ''
       };
-
-      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, {
-        method: 'PUT',
-        body: JSON.stringify(payload)
-      });
-
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, { method: 'PUT', body: JSON.stringify(payload) });
       resetAdminForm();
       await renderAdminTable();
-      alert(`PNR #${pnr} लाइव डेटाबेस में सेव हो गया!`);
+      alert(`PNR #${pnr} सेव हो गया!`);
+    }
+
+    async function confirmTicket(pnr) {
+      await fetch(`${FIREBASE_URL}/pnr_records/${pnr}/status.json`, { method: 'PUT', body: JSON.stringify('confirmed') });
+      await renderAdminTable();
+      alert(`PNR #${pnr} कन्फर्म हो गया! अब कस्टमर को E-Boarding Pass दिखेगा।`);
+    }
+
+    function previewTicketAdmin(pnr) {
+      const item = cachedRecords[pnr];
+      if (!item) return;
+      switchView('customer');
+      document.getElementById('pnrInput').value = pnr;
+      renderBoardingPass(item);
     }
 
     function editRecord(pnr) {
@@ -340,9 +490,12 @@
       if (!item) return;
       document.getElementById('adminPnr').value = item.pnr;
       document.getElementById('adminPnr').readOnly = true;
+      document.getElementById('adminStatus').value = item.status || 'pending';
       document.getElementById('adminCustomerName').value = item.customerName || '';
       document.getElementById('adminFlightNo').value = item.flightNo || '';
       document.getElementById('adminFlightTime').value = item.flightTime || '';
+      document.getElementById('adminSeat').value = item.seat || '';
+      document.getElementById('adminGate').value = item.gate || '';
       document.getElementById('adminAmount').value = item.amount;
       document.getElementById('adminUpi').value = item.upi;
       document.getElementById('adminNote').value = item.note || '';
@@ -351,13 +504,14 @@
     }
 
     async function deleteRecord(pnr) {
-      if (!confirm(`PNR #${pnr} को लाइव डेटाबेस से डिलीट करें?`)) return;
+      if (!confirm(`PNR #${pnr} को डिलीट करें?`)) return;
       await fetch(`${FIREBASE_URL}/pnr_records/${pnr}.json`, { method: 'DELETE' });
       await renderAdminTable();
     }
 
     function resetAdminForm() {
-      ['adminPnr','adminCustomerName','adminFlightNo','adminFlightTime','adminAmount','adminUpi','adminNote'].forEach(id => document.getElementById(id).value = '');
+      ['adminPnr','adminCustomerName','adminFlightNo','adminFlightTime','adminSeat','adminGate','adminAmount','adminUpi','adminNote'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('adminStatus').value = 'pending';
       document.getElementById('adminPnr').readOnly = false;
       document.getElementById('formHeading').innerHTML = `<span>➕</span> नया PNR Number जोड़ें`;
       document.getElementById('cancelEditBtn').classList.add('hidden');
@@ -368,14 +522,11 @@
       if (!newUpi) return alert('नई UPI ID लिखें।');
       const records = await fetchRecords();
       for (const k of Object.keys(records)) {
-        await fetch(`${FIREBASE_URL}/pnr_records/${k}/upi.json`, {
-          method: 'PUT',
-          body: JSON.stringify(newUpi)
-        });
+        await fetch(`${FIREBASE_URL}/pnr_records/${k}/upi.json`, { method: 'PUT', body: JSON.stringify(newUpi) });
       }
       document.getElementById('bulkUpiInput').value = '';
       await renderAdminTable();
-      alert('सभी UPI ID लाइव अपडेट हो गईं!');
+      alert('सभी UPI ID अपडेट हो गईं!');
     }
 
     async function renderAdminTable() {
@@ -384,10 +535,20 @@
       const records = await fetchRecords();
       const keys = Object.keys(records);
       document.getElementById('recordCount').textContent = keys.length;
-      tbody.innerHTML = keys.length ? '' : `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">अभी कोई लाइव PNR नहीं है। नया PNR जोड़ें।</td></tr>`;
+      tbody.innerHTML = keys.length ? '' : `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">अभी कोई लाइव PNR नहीं है।</td></tr>`;
       keys.forEach(k => {
         const item = records[k];
-        tbody.innerHTML += `<tr><td class="py-3 px-4"><b class="text-[#001b94]">#${item.pnr}</b><div class="text-xs font-bold">${item.customerName || '-'}</div>${item.utr ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">UTR: ${item.utr}</span>` : ''}</td><td class="py-3 px-4"><span class="text-xs font-bold bg-slate-100 px-1.5 py-0.5 rounded">${item.flightNo || '-'}</span><div class="text-[11px] text-slate-600 mt-0.5">${item.flightTime || '-'}</div></td><td class="py-3 px-4"><b>₹${item.amount}</b><div class="font-mono text-[11px] text-slate-600 break-all">${item.upi}</div></td><td class="py-3 px-4 text-right whitespace-nowrap"><button type="button" onclick="editRecord('${item.pnr}')" class="bg-blue-50 text-[#001b94] font-bold text-xs px-2.5 py-1 rounded-lg mr-1">Edit</button><button type="button" onclick="deleteRecord('${item.pnr}')" class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-lg">Del</button></td></tr>`;
+        const isConf = item.status === 'confirmed';
+        tbody.innerHTML += `<tr>
+          <td class="py-3 px-4"><b class="text-[#001b94]">#${item.pnr}</b><div class="text-xs font-bold">${item.customerName || '-'}</div>${item.utr ? `<span class="text-[10px] bg-blue-100 text-[#001b94] font-bold px-1.5 py-0.5 rounded">UTR: ${item.utr}</span>` : ''}</td>
+          <td class="py-3 px-4"><span class="text-xs font-bold bg-slate-100 px-1.5 py-0.5 rounded">${item.flightNo || '-'}</span> <span class="text-[10px] font-bold ${isConf ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} px-1.5 py-0.5 rounded">${isConf ? 'Confirmed' : 'Pending'}</span><div class="text-[11px] text-slate-600 mt-0.5">${item.flightTime || '-'}</div></td>
+          <td class="py-3 px-4"><b>₹${item.amount}</b></td>
+          <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+            ${!isConf ? `<button type="button" onclick="confirmTicket('${item.pnr}')" class="bg-emerald-600 text-white font-bold text-xs px-2 py-1 rounded-lg">Confirm</button>` : `<button type="button" onclick="previewTicketAdmin('${item.pnr}')" class="bg-indigo-600 text-white font-bold text-xs px-2 py-1 rounded-lg">Ticket</button>`}
+            <button type="button" onclick="editRecord('${item.pnr}')" class="bg-blue-50 text-[#001b94] font-bold text-xs px-2 py-1 rounded-lg">Edit</button>
+            <button type="button" onclick="deleteRecord('${item.pnr}')" class="bg-red-50 text-red-600 font-bold text-xs px-2 py-1 rounded-lg">Del</button>
+          </td>
+        </tr>`;
       });
     }
   </script>
