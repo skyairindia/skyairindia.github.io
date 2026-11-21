@@ -11,11 +11,21 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f7fb; }
     .sky-gradient { background: linear-gradient(135deg, #02135c 0%, #002db3 55%, #0284c7 100%); }
     #qrcode img, #qrcode canvas { margin: 0 auto; border-radius: 12px; padding: 8px; background: white; border: 1px solid #e2e8f0; }
-    #ticketBarcode img, #ticketBarcode canvas, #retTicketBarcode img, #retTicketBarcode canvas { display: inline-block; }
+    #ticketBarcode img, #ticketBarcode canvas, #retTicketBarcode img, #retTicketBarcode canvas, #manualTicketQr img, #manualTicketQr canvas { display: inline-block; }
     @media print {
       body * { visibility: hidden; }
-      #boardingPassCard, #boardingPassCard * { visibility: visible; }
-      #boardingPassCard { position: fixed; left: 0; top: 0; width: 100%; box-shadow: none !important; border: none !important; padding: 10px !important; }
+      body.printing-manual #manualTicketPrintCard,
+      body.printing-manual #manualTicketPrintCard * { visibility: visible; }
+      body.printing-manual #manualTicketPrintCard {
+        position: fixed; left: 0; top: 0; width: 100%;
+        box-shadow: none !important; border: none !important; padding: 10px !important;
+      }
+      body:not(.printing-manual) #boardingPassCard,
+      body:not(.printing-manual) #boardingPassCard * { visibility: visible; }
+      body:not(.printing-manual) #boardingPassCard {
+        position: fixed; left: 0; top: 0; width: 100%;
+        box-shadow: none !important; border: none !important; padding: 10px !important;
+      }
       .no-print { display: none !important; }
     }
   </style>
@@ -53,8 +63,7 @@
       </div>
     </div>
   </header>
-
-  <div id="heroBanner" class="sky-gradient text-white pt-7 pb-20 px-4 no-print">
+    <div id="heroBanner" class="sky-gradient text-white pt-7 pb-20 px-4 no-print">
     <div class="max-w-4xl mx-auto text-center">
       <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full p-1 mb-4">
         <button type="button" id="heroTabSearch" onclick="switchMainTab('search')" class="bg-white text-[#02135c] text-xs font-extrabold px-4 py-1.5 rounded-full shadow-sm transition">✈️ Book Flights</button>
@@ -159,7 +168,8 @@
           </div>
         </form>
       </div>
-            <div id="flightResultsSection" class="hidden mt-6 space-y-3">
+
+      <div id="flightResultsSection" class="hidden mt-6 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2 bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm">
           <div>
             <h3 id="resultsRouteHeading" class="font-extrabold text-base text-slate-900">New Delhi → Mumbai</h3>
@@ -237,8 +247,7 @@
         </div>
       </div>
     </section>
-
-    <div id="bookFlightModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
+        <div id="bookFlightModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
       <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <h3 class="font-extrabold text-lg text-slate-900">Complete Flight Reservation</h3>
@@ -401,7 +410,8 @@
           </div>
         </div>
       </div>
-            <div id="boardingPassCard" class="hidden mt-6 bg-white rounded-2xl shadow-xl border border-slate-200 p-5 sm:p-8 text-slate-900">
+
+      <div id="boardingPassCard" class="hidden mt-6 bg-white rounded-2xl shadow-xl border border-slate-200 p-5 sm:p-8 text-slate-900">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-4">
           <div class="flex items-center gap-2">
             <span class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#02135c]">SkyAir</span>
@@ -529,18 +539,17 @@
         <p class="text-[11px] text-slate-600 mt-3">*Booking date reflects in UTC (Coordinated Universal Time), all other timings mentioned are as per local TIME</p>
 
         <div class="mt-5 pt-4 border-t border-slate-200 flex gap-2.5 no-print">
-          <button type="button" onclick="window.print()" class="w-full sky-gradient text-white font-bold py-3.5 rounded-xl shadow-md text-sm flex items-center justify-center gap-2">
+          <button type="button" onclick="printBoardingPass()" class="w-full sky-gradient text-white font-bold py-3.5 rounded-xl shadow-md text-sm flex items-center justify-center gap-2">
             🖨️ E-Ticket डाउनलोड / प्रिंट करें (Save PDF)
           </button>
         </div>
       </div>
     </section>
-
-    <section id="adminView" class="hidden no-print mt-6">
+        <section id="adminView" class="hidden no-print mt-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-extrabold text-slate-900">Admin Control Dashboard</h2>
-          <p class="text-xs sm:text-sm text-slate-500">ऑटो-लॉगिन सक्रिय है • PNR, Round-Trip और Promo Code डिस्काउंट यहीं से सेट करें।</p>
+          <p class="text-xs sm:text-sm text-slate-500">ऑटो-लॉगिन सक्रिय है • PNR, Round-Trip, Promo Code और Manual Ticket यहीं से बनाएं।</p>
         </div>
         <button type="button" onclick="switchMainTab('search')" class="self-start sm:self-auto bg-white border border-slate-300 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm">← ग्राहक वेबसाइट देखें</button>
       </div>
@@ -560,12 +569,145 @@
         </div>
       </div>
 
+      <!-- Manual Admin Ticket Generator (Independent of Customer Booking Flow) -->
+      <div class="bg-white rounded-2xl shadow-sm border-2 border-indigo-200 p-5 sm:p-6 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-[#02135c] flex items-center gap-2">
+              <span>🎟️</span> Admin Manual Ticket Generator (Pending / Confirmed)
+            </h3>
+            <p class="text-xs text-slate-500">कस्टमर बुकिंग फ़्लो से बिल्कुल अलग—यहाँ से अपनी मर्ज़ी की डिटेल्स डालकर तुरंत टिकट जनरेट और प्रिंट करें।</p>
+          </div>
+          <span class="text-[11px] font-extrabold bg-indigo-50 text-indigo-800 border border-indigo-200 px-3 py-1 rounded-full">Admin Only • Internal Desk</span>
+        </div>
+
+        <form onsubmit="generateManualTicket(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <input type="hidden" id="manualEditId" value="" />
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Ticket Status *</label>
+            <select id="manualStatus" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-extrabold bg-white">
+              <option value="pending">⏳ Pending</option>
+              <option value="confirmed">✅ Confirmed</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Ticket / PNR Code *</label>
+            <input type="text" id="manualCode" placeholder="AUTO या जैसे: MAN901" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold uppercase" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Passenger Name *</label>
+            <input type="text" id="manualPaxName" placeholder="उदाहरण: Amit Verma" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Passenger Meta</label>
+            <input type="text" id="manualPaxMeta" placeholder="Adult | Male | Economy" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Airline & Flight No *</label>
+            <input type="text" id="manualFlight" placeholder="IndiGo 6E 2045" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Route / Sector *</label>
+            <input type="text" id="manualSector" placeholder="GWL-DEL" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold uppercase" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Flight Date *</label>
+            <input type="text" id="manualDate" placeholder="25 Nov 2026" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Departure → Arrival Time *</label>
+            <input type="text" id="manualTiming" placeholder="08:30 → 09:45" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Seat & Baggage</label>
+            <input type="text" id="manualSeat" placeholder="12A • 15kg Check-in" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Ticket Fare (₹)</label>
+            <input type="number" id="manualFare" placeholder="4500" min="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-600 mb-1">Internal Remark / Note</label>
+            <input type="text" id="manualNote" placeholder="ऑफिस/इंटरनल रिकॉर्ड के लिए नोट (वैकल्पिक)" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap gap-2 pt-1">
+            <button type="submit" class="sky-gradient text-white font-extrabold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-sm">🎟️ Generate & Preview Ticket</button>
+            <button type="button" onclick="resetManualForm()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm">Reset Form</button>
+          </div>
+        </form>
+
+        <div id="manualTicketPrintCard" class="hidden mt-5 border-2 border-dashed border-slate-400 rounded-2xl p-5 bg-slate-50/60">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300">
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-extrabold text-[#02135c]">SkyAir Manual Ticket</span>
+              <span id="mtBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">⏳ PENDING</span>
+            </div>
+            <div class="text-xs font-extrabold text-slate-700">Code: <span id="mtCode" class="text-[#02135c]">-</span></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4 text-xs">
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Passenger</p>
+              <p id="mtPax" class="font-extrabold text-sm text-slate-900 mt-0.5">-</p>
+              <p id="mtPaxMeta" class="text-[11px] text-slate-500">-</p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Flight & Route</p>
+              <p id="mtFlight" class="font-extrabold text-sm text-[#02135c] mt-0.5">-</p>
+              <p id="mtSector" class="text-[11px] font-bold text-slate-700">-</p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Schedule & Fare</p>
+              <p id="mtDateTime" class="font-extrabold text-xs text-slate-900 mt-0.5">-</p>
+              <p id="mtSeatFare" class="text-[11px] text-slate-600 mt-0.5">-</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <div class="flex items-center gap-3">
+              <div id="manualTicketQr" class="bg-white p-1.5 rounded-lg border border-slate-200"></div>
+              <p id="mtNote" class="text-xs text-slate-600 font-medium"></p>
+            </div>
+            <button type="button" onclick="printManualTicket()" class="no-print bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-xs">🖨️ Print / Save PDF</button>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <h4 class="text-xs font-extrabold text-slate-700 uppercase mb-2">Generated Manual Tickets (<span id="manualTicketCount">0</span>)</h4>
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
+                  <th class="py-2.5 px-3">Code & Passenger</th>
+                  <th class="py-2.5 px-3">Flight & Route</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="manualTicketsBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-fit">
           <h3 id="formHeading" class="text-base font-extrabold text-slate-900 mb-3 flex items-center gap-2"><span>➕</span> नया PNR / E-Ticket जोड़ें</h3>
           <form onsubmit="saveRecord(event)" class="space-y-2.5 text-xs">
             <input type="hidden" id="originalPnrKey" value="" />
-                        <div class="bg-blue-50/80 p-2.5 rounded-xl border border-blue-100">
+            <div class="bg-blue-50/80 p-2.5 rounded-xl border border-blue-100">
               <label class="block font-extrabold text-[#02135c] mb-1">यात्रा का प्रकार (Trip Type) *</label>
               <select id="adminTripType" onchange="toggleReturnFields()" class="w-full px-3 py-2 rounded-lg border border-blue-200 font-extrabold bg-white text-slate-900">
                 <option value="single">➡️ Single / One-Way (सिर्फ़ जाने का)</option>
@@ -586,7 +728,7 @@
                 </select>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-2.5">
+                        <div class="grid grid-cols-2 gap-2.5">
               <div>
                 <label class="block font-bold text-slate-600 mb-1">यात्री का नाम *</label>
                 <input type="text" id="adminCustomerName" placeholder="Mr Mindu Norbu" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold" />
@@ -831,6 +973,7 @@
     };
 
     let cachedRecords = {};
+    let cachedManualTickets = {};
     let currentActiveItem = null;
     let secretTapCount = 0;
     let secretTapTimer = null;
@@ -871,6 +1014,7 @@
         document.getElementById('adminView').classList.remove('hidden');
         document.getElementById('logoutHeaderBtn').classList.remove('hidden');
         renderAdminTable();
+        renderManualTicketsTable();
       } else if (tab === 'pnr') {
         document.getElementById('heroBanner').classList.remove('hidden');
         document.getElementById('customerView').classList.remove('hidden');
@@ -1026,7 +1170,18 @@
       document.getElementById('generatedRefCode').textContent = ref;
       document.getElementById('reqSuccessBox').classList.remove('hidden');
     }
-          function startHoldTimer() {
+      function printBoardingPass() {
+      document.body.classList.remove('printing-manual');
+      window.print();
+    }
+
+    function printManualTicket() {
+      document.body.classList.add('printing-manual');
+      window.print();
+      setTimeout(() => document.body.classList.remove('printing-manual'), 500);
+    }
+
+    function startHoldTimer() {
       clearInterval(holdTimerInterval);
       let secs = 14 * 60 + 59;
       holdTimerInterval = setInterval(() => {
@@ -1067,6 +1222,154 @@
         alert('इंटरनेट या डेटाबेस कनेक्शन में समस्या है!');
         return cachedRecords;
       }
+    }
+
+    /* --- Admin Manual Ticket Generator Functions (Separate from Customer Flow) --- */
+    async function fetchManualTickets() {
+      try {
+        const res = await fetch(`${FIREBASE_URL}/manual_tickets.json`);
+        const data = await res.json();
+        cachedManualTickets = data || {};
+        return cachedManualTickets;
+      } catch (err) {
+        return cachedManualTickets;
+      }
+    }
+
+    function showManualTicketPreview(tkt) {
+      const card = document.getElementById('manualTicketPrintCard');
+      card.classList.remove('hidden');
+
+      const isConf = tkt.status === 'confirmed';
+      const badge = document.getElementById('mtBadge');
+      badge.textContent = isConf ? '✅ CONFIRMED' : '⏳ PENDING';
+      badge.className = isConf
+        ? 'text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+        : 'text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+
+      document.getElementById('mtCode').textContent = tkt.code;
+      document.getElementById('mtPax').textContent = tkt.paxName || 'Passenger';
+      document.getElementById('mtPaxMeta').textContent = tkt.paxMeta || 'Adult • Economy';
+      document.getElementById('mtFlight').textContent = tkt.flight || '-';
+      document.getElementById('mtSector').textContent = tkt.sector || '-';
+      document.getElementById('mtDateTime').textContent = `${tkt.date || ''} • ${tkt.timing || ''}`;
+      document.getElementById('mtSeatFare').textContent = `${tkt.seat || 'Standard'} • Fare: ₹${Number(tkt.fare || 0).toLocaleString('en-IN')}`;
+      document.getElementById('mtNote').textContent = tkt.note ? `Note: ${tkt.note}` : 'Internal Admin Generated Ticket';
+
+      const qrBox = document.getElementById('manualTicketQr');
+      qrBox.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: `MANUAL|${tkt.code}|${tkt.paxName}|${tkt.sector}|${tkt.status.toUpperCase()}`,
+          width: 72, height: 72, colorDark: '#02135c', colorLight: '#ffffff'
+        });
+      }
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function generateManualTicket(e) {
+      e.preventDefault();
+      const rawCode = document.getElementById('manualCode').value.trim().toUpperCase();
+      const code = rawCode || ('MAN' + Math.floor(1000 + Math.random() * 9000));
+      const ticketObj = {
+        code: code,
+        status: document.getElementById('manualStatus').value === 'confirmed' ? 'confirmed' : 'pending',
+        paxName: document.getElementById('manualPaxName').value.trim(),
+        paxMeta: document.getElementById('manualPaxMeta').value.trim() || 'Adult • Economy',
+        flight: document.getElementById('manualFlight').value.trim(),
+        sector: document.getElementById('manualSector').value.trim().toUpperCase(),
+        date: document.getElementById('manualDate').value.trim(),
+        timing: document.getElementById('manualTiming').value.trim(),
+        seat: document.getElementById('manualSeat').value.trim() || 'Standard',
+        fare: Number(document.getElementById('manualFare').value || 0),
+        note: document.getElementById('manualNote').value.trim(),
+        createdAt: new Date().toISOString()
+      };
+
+      cachedManualTickets[code] = ticketObj;
+      try {
+        await fetch(`${FIREBASE_URL}/manual_tickets/${code}.json`, {
+          method: 'PUT',
+          body: JSON.stringify(ticketObj)
+        });
+      } catch (_) {}
+
+      showManualTicketPreview(ticketObj);
+      renderManualTicketsTable();
+    }
+
+    async function toggleManualTicketStatus(code) {
+      const tkt = cachedManualTickets[code];
+      if (!tkt) return;
+      tkt.status = tkt.status === 'confirmed' ? 'pending' : 'confirmed';
+      try {
+        await fetch(`${FIREBASE_URL}/manual_tickets/${code}/status.json`, {
+          method: 'PUT',
+          body: JSON.stringify(tkt.status)
+        });
+      } catch (_) {}
+      showManualTicketPreview(tkt);
+      renderManualTicketsTable();
+    }
+
+    function loadManualTicketForEdit(code) {
+      const tkt = cachedManualTickets[code];
+      if (!tkt) return;
+      document.getElementById('manualStatus').value = tkt.status || 'pending';
+      document.getElementById('manualCode').value = tkt.code || '';
+      document.getElementById('manualPaxName').value = tkt.paxName || '';
+      document.getElementById('manualPaxMeta').value = tkt.paxMeta || '';
+      document.getElementById('manualFlight').value = tkt.flight || '';
+      document.getElementById('manualSector').value = tkt.sector || '';
+      document.getElementById('manualDate').value = tkt.date || '';
+      document.getElementById('manualTiming').value = tkt.timing || '';
+      document.getElementById('manualSeat').value = tkt.seat || '';
+      document.getElementById('manualFare').value = tkt.fare || '';
+      document.getElementById('manualNote').value = tkt.note || '';
+      showManualTicketPreview(tkt);
+    }
+
+          async function deleteManualTicket(code) {
+      if (!confirm(`Manual Ticket ${code} को डिलीट करें?`)) return;
+      delete cachedManualTickets[code];
+      try {
+        await fetch(`${FIREBASE_URL}/manual_tickets/${code}.json`, { method: 'DELETE' });
+      } catch (_) {}
+      renderManualTicketsTable();
+    }
+
+    function resetManualForm() {
+      ['manualCode','manualPaxName','manualPaxMeta','manualFlight','manualSector','manualDate','manualTiming','manualSeat','manualFare','manualNote'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('manualStatus').value = 'pending';
+    }
+
+    async function renderManualTicketsTable() {
+      await fetchManualTickets();
+      const keys = Object.keys(cachedManualTickets);
+      const tbody = document.getElementById('manualTicketsBody');
+      document.getElementById('manualTicketCount').textContent = keys.length;
+      if (!keys.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">अभी कोई मैनुअल टिकट नहीं बनी है।</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = '';
+      keys.forEach(k => {
+        const t = cachedManualTickets[k];
+        const isConf = t.status === 'confirmed';
+        tbody.innerHTML += `<tr>
+          <td class="py-2.5 px-3"><b class="text-[#02135c]">${t.code}</b><div class="font-bold text-slate-800">${t.paxName}</div></td>
+          <td class="py-2.5 px-3"><span class="font-bold">${t.flight}</span> (${t.sector})<div class="text-[11px] text-slate-500">${t.date} • ${t.timing}</div></td>
+          <td class="py-2.5 px-3"><span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isConf ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${isConf ? 'Confirmed' : 'Pending'}</span></td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap space-x-1">
+            <button type="button" onclick="showManualTicketPreview('${t.code}')" class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg">View/Print</button>
+            <button type="button" onclick="toggleManualTicketStatus('${t.code}')" class="bg-slate-800 text-white font-bold px-2 py-1 rounded-lg">${isConf ? 'Set Pending' : 'Confirm'}</button>
+            <button type="button" onclick="loadManualTicketForEdit('${t.code}')" class="bg-blue-50 text-[#02135c] font-bold px-2 py-1 rounded-lg">Edit</button>
+            <button type="button" onclick="deleteManualTicket('${t.code}')" class="bg-red-50 text-red-600 font-bold px-2 py-1 rounded-lg">Del</button>
+          </td>
+        </tr>`;
+      });
     }
 
     function renderBoardingPass(item) {
@@ -1189,7 +1492,7 @@
           return;
         }
 
-        startHoldTimer();
+              startHoldTimer();
         const isRound = item.tripType === 'round';
         const totalAmt = Number(item.amount || 0);
         const taxAmt = Math.round(totalAmt * 0.12);
@@ -1394,7 +1697,7 @@
       document.getElementById('adminEnablePromo').checked = false;
       togglePromoFields();
       document.getElementById('adminStatus').value = 'pending';
-            document.getElementById('formHeading').innerHTML = `<span>➕</span> नया PNR / E-Ticket जोड़ें`;
+      document.getElementById('formHeading').innerHTML = `<span>➕</span> नया PNR / E-Ticket जोड़ें`;
       document.getElementById('cancelEditBtn').classList.add('hidden');
     }
 
@@ -1416,7 +1719,8 @@
         tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
       });
     }
-          async function renderAdminTable() {
+
+    async function renderAdminTable() {
       const tbody = document.getElementById('recordsTableBody');
       tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">डेटा लोड हो रहा है...</td></tr>`;
       const records = await fetchRecords();
@@ -1450,4 +1754,4 @@
     }
   </script>
 </body>
-</html>
+</html
